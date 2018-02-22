@@ -1,6 +1,6 @@
 # Moisture_Bot
 
-A Twitch bot used to track FortNite wins during a stream, fairly basic in functionality for now.
+A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.P., use at your own risk!!
 
 ### Requirements
 
