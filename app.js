@@ -94,7 +94,7 @@ client.on("chat", (channel, user, message, self) => {
   //all users commands list
   switch (msgArray[0]) {
     case "!wins":
-      client.action(channelName, fortnite.showWins());
+      client.action(channelName, fortnite.getStats("wins"));
       break;
 
     case "!getstats":

@@ -210,105 +210,113 @@ module.exports = class FNscores {
 
     //check for valid stat type here... soon
     const stats = this.fetchData();
+    const storedStats = this.fetchStoredData();
+
     const soloStats = stats.stats.p2;
     const duoStats = stats.stats.p10;
     const squadStats = stats.stats.p9;
     const recentMatches = stats.recentMatches;
-
-    const storedStats = this.fetchStoredData();
-
     //const lifetimeStats = stats.lifeTimeStats;
 
     switch (statType) {
       case "help":
-        return "You can get the following stats: allwins (solo/duo/total), allkills (solo/duo/total), wins (solo/duo), kills (solo/duo), matches (solo/duo), recent";
+        return "You can get the following stats: allwins, allkills, allmatches, wins, kills, matches, recent";
         break;
 
       case "allwins":
-        if (gameType === "duo") {
-          return "Total duo wins to date: " + duoStats.top1.value;
-        } else if (gameType === "solo") {
-          return "Total solo wins to date: " + soloStats.top1.value;
-        } else if (gameType === "total") {
-          return (
-            "Total overall wins (solo, duo, and squad): " +
-            (Number(duoStats.top1.value) +
-              Number(soloStats.top1.value) +
-              Number(squadStats.top1.value))
-          );
-        } else {
-          return "Use 'allkills duo', 'allkills solo', or 'allkills total'";
-        }
+        let allWinsMessage = "";
+        const allWinsBigTotal =
+          Number(duoStats.top1.value) +
+          Number(soloStats.top1.value) +
+          Number(squadStats.top1.value);
+
+        allWinsMessage = `Total overall wins: ${soloStats.top1.value} solo, ${
+          duoStats.top1.value
+        } duo, and ${squadStats.top1.value} squad. Total combined: `;
+        allWinsMessage += allWinsBigTotal;
+
+        return allWinsMessage;
         break;
 
       case "wins":
-        console.log("storedStats.duo", storedStats.duo);
-        if (gameType === "duo") {
-          return (
-            "Total duo wins this session: " +
-            (Number(duoStats.top1.value) - Number(storedStats.duo.top1))
-          );
-        } else {
-          return (
-            "Total solo wins this session: " +
-            (Number(soloStats.top1.value) - Number(storedStats.solo.top1))
-          );
+        let winsMessage = "";
+
+        const winsSolo =
+          Number(soloStats.top1.value) - Number(storedStats.solo.top1);
+        const winsDuo =
+          Number(duoStats.top1.value) - Number(storedStats.duo.top1);
+        const winsSquad =
+          Number(squadStats.top1.value) - Number(storedStats.squad.top1);
+        const winsTot = winsSolo + winsDuo + winsSquad;
+
+        winsMessage += `Total wins this session: ${winsTot} (${winsSolo} solo, ${winsDuo} duo, ${winsSquad} squad)`;
+
+        //lol - add PJSalt memes
+        if (winsTot === 0) {
+          winsMessage += " PJSalt";
         }
+
+        //add big win memes
+        if (winsTot > 5) {
+          winsMessage += " PogChamp";
+        }
+
+        return winsMessage;
         break;
 
       case "allkills":
-        if (gameType === "duo") {
-          return "Total duo kills to date: " + duoStats.kills.value;
-        } else if (gameType === "solo") {
-          return "Total solo kills to date: " + soloStats.kills.value;
-        } else if (gameType === "total") {
-          return (
-            "Total overall kills (solo, duo, and squad): " +
-            (Number(duoStats.kills.value) +
-              Number(soloStats.kills.value) +
-              Number(squadStats.kills.value))
-          );
-        } else {
-          return "Use 'allkills duo', 'allkills solo', or 'allkills total'";
-        }
+        let allKillsMessage = "";
+        const totWinsSolo = Number(soloStats.kills.value);
+        const totWinsDuo = Number(duoStats.kills.value);
+        const totWinsSquad = Number(squadStats.kills.value);
+        const allKillsBigTotal = totWinsSolo + totWinsDuo + totWinsSquad;
+
+        allKillsMessage = `Total overall kills: ${allKillsBigTotal} (${totWinsSolo} solo, ${totWinsDuo} duo, and ${totWinsSquad} squad)`;
+
+        return allKillsMessage;
         break;
 
       case "kills":
-        if (gameType === "duo") {
-          return (
-            "Total duo kills this session: " +
-            (Number(duoStats.kills.value) - Number(storedStats.duo.kills))
-          );
-        } else if (gameType === "solo") {
-          return (
-            "Total solo kills this session: " +
-            (Number(soloStats.kills.value) - Number(storedStats.solo.kills))
-          );
-        } else {
-          return "Use 'kills duo' or 'kills solo', that wasn't recognized.";
-        }
+        let curKillsMessage = "";
+        const curKillsSolo =
+          Number(soloStats.kills.value) - Number(storedStats.solo.kills);
+        const curKillsDuo =
+          Number(duoStats.kills.value) - Number(storedStats.duo.kills);
+        const curKillsSquad =
+          Number(squadStats.kills.value) - Number(storedStats.squad.kills);
+        const curKillsBigTotal = curKillsSolo + curKillsDuo + curKillsSquad;
+
+        curKillsMessage = `Total kills this session: ${curKillsBigTotal} (${curKillsSolo} solo, ${curKillsDuo} duo, and ${curKillsSquad} squad)`;
+
+        return curKillsMessage;
         break;
 
       case "allmatches":
-        if (gameType === "duo") {
-          return "Total duo matches to date: " + duoStats.matches.value;
-        } else {
-          return "Total solo matches to date: " + soloStats.matches.value;
-        }
+        let allMatchesMessage = "";
+        const allMatchesSolo = Number(soloStats.matches.value);
+        const allMatchesDuo = Number(duoStats.matches.value);
+        const allMatchesSquad = Number(squadStats.matches.value);
+        const allMatchesBigTotal =
+          allMatchesSolo + allMatchesDuo + allMatchesSquad;
+
+        allMatchesMessage = `Total matches to date: ${allMatchesBigTotal} (${allMatchesSolo} solo, ${allMatchesDuo} duo, ${allMatchesSquad} squad)`;
+
+        return allMatchesMessage;
         break;
 
       case "matches":
-        if (gameType === "duo") {
-          return (
-            "Total duo matches this session: " +
-            (Number(duoStats.matches.value) - Number(storedStats.duo.matches))
-          );
-        } else {
-          return (
-            "Total solo matches this session: " +
-            (Number(soloStats.matches.value) - Number(storedStats.solo.matches))
-          );
-        }
+        let curMatchesMessage = "";
+        const curMatchesSolo =
+          Number(soloStats.matches.value) - Number(storedStats.solo.matches);
+        const curMatchesDuo =
+          Number(duoStats.matches.value) - Number(storedStats.duo.matches);
+        const curMatchesSquad =
+          Number(squadStats.matches.value) - Number(storedStats.squad.matches);
+        const curMatchesBigTotal =
+          curMatchesSolo + curMatchesDuo + curMatchesSquad;
+
+        curMatchesMessage = `Total matches this session: ${curMatchesBigTotal} (${curMatchesSolo} solo, ${curMatchesDuo} duo, ${curMatchesSquad} squad)`;
+        return curMatcheshMessage;
         break;
 
       case "recent":
