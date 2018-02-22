@@ -1,5 +1,8 @@
 # Moisture_Bot
 
+[![nodejs](https://img.shields.io/badge/node.js-9.2.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
+[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](paypal.me/stoutlabs/1.99)
+
 A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.P., use at your own risk!!
 
 ### Requirements
@@ -29,6 +32,8 @@ A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.
 ### Current Requests/To-Dos
 
 * Connect to Last.Fm to pull current song playing (new mode)
+* Browser interface
+* Much much more... this is just the start!
 
 ### Special Thanks
 
