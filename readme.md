@@ -16,11 +16,11 @@ A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.
 
 1. Install Node.js on your machine, if not installed already. (It's small and lightweight, it'll run on a potato!)
 2. Download this repo into a directory of your choice
-3. Edit the 'options.js' file, updating the appropriate values for: your twitch bot's account name and oauth token, channel name, and your Fortnite Tracker API URL/key
-
-4. Open a command prompt in the directory (In Windows, right click and select "open command prompt here")
-5. At the prompt, type: npm install
-6. Your bot is now ready to be run! (You only have to run the above command once.)
+3. Rename the 'options_default.js' file to 'options.js'
+4. Open/edit the 'options.js' file, updating the appropriate values for: your twitch bot's account name and oauth token, channel name, and your Fortnite Tracker API URL/key
+5. Open a command prompt in the directory (In Windows, right click and select "open command prompt here")
+6. At the prompt, type: npm install
+7. Your bot is now ready to be run! (Note: You only have to run these steps once.)
 
 ### Usage
 
