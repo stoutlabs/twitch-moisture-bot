@@ -3,6 +3,7 @@ const fs = require("fs");
 const axios = require("axios");
 
 const datafile = path.join(__dirname, "fortnite-data.json");
+const storagefile = path.join(__dirname, "fortnite-stored.json");
 let myData = {};
 
 module.exports = class FNscores {
@@ -21,6 +22,49 @@ module.exports = class FNscores {
       return JSON.parse(statsString);
     } catch (err) {
       return [];
+    }
+  }
+
+  fetchStoredData() {
+    try {
+      const storedStatsString = fs.readFileSync(storagefile);
+      return JSON.parse(storedStatsString);
+    } catch (err) {
+      return [];
+    }
+  }
+
+  storeInitialStats() {
+    const stats = this.fetchData();
+    const soloStats = stats.stats.p2;
+    const duoStats = stats.stats.p10;
+    const squadStats = stats.stats.p9;
+
+    const initialData = {
+      solo: {
+        matches: soloStats.matches.value,
+        kills: soloStats.kills.value,
+        top1: soloStats.top1.value,
+        top5: soloStats.top5.value
+      },
+      duo: {
+        matches: duoStats.matches.value,
+        kills: duoStats.kills.value,
+        top1: duoStats.top1.value,
+        top5: duoStats.top5.value
+      },
+      squad: {
+        matches: squadStats.matches.value,
+        kills: squadStats.kills.value,
+        top1: squadStats.top1.value,
+        top5: squadStats.top5.value
+      }
+    };
+
+    if (fs.writeFileSync(storagefile, JSON.stringify(initialData))) {
+      return true;
+    } else {
+      return "Error saving initial data.";
     }
   }
 
@@ -172,15 +216,18 @@ module.exports = class FNscores {
     const soloStats = stats.stats.p2;
     const duoStats = stats.stats.p10;
     const squadStats = stats.stats.p9;
-    const lifetimeStats = stats.lifeTimeStats;
     const recentMatches = stats.recentMatches;
+
+    const storedStats = this.fetchStoredData();
+
+    //const lifetimeStats = stats.lifeTimeStats;
 
     switch (statType) {
       case "help":
         return "You can get the following stats: wins, wins duo, kills, kills duo, matches, matches duo, lastmatch";
         break;
 
-      case "wins":
+      case "allwins":
         if (gameType === "duo") {
           return "Total duo wins to date: " + duoStats.top1.value;
         } else {
@@ -188,7 +235,22 @@ module.exports = class FNscores {
         }
         break;
 
-      case "kills":
+      case "wins":
+        console.log("storedStats.duo", storedStats.duo);
+        if (gameType === "duo") {
+          return (
+            "Total duo wins this session: " +
+            (Number(duoStats.top1.value) - Number(storedStats.duo.top1))
+          );
+        } else {
+          return (
+            "Total solo wins this session: " +
+            (Number(soloStats.top1.value) - Number(storedStats.solo.top1))
+          );
+        }
+        break;
+
+      case "allkills":
         if (gameType === "duo") {
           return "Total duo kills to date: " + duoStats.kills.value;
         } else if (gameType === "solo") {
@@ -198,7 +260,23 @@ module.exports = class FNscores {
         }
         break;
 
-      case "matches":
+      case "kills":
+        if (gameType === "duo") {
+          return (
+            "Total duo kills this session: " +
+            (Number(duoStats.kills.value) - Number(storedStats.duo.kills))
+          );
+        } else if (gameType === "solo") {
+          return (
+            "Total solo kills this session: " +
+            (Number(soloStats.kills.value) - Number(storedStats.solo.kills))
+          );
+        } else {
+          return "Use 'kills duo' or 'kills solo', that wasn't recognized.";
+        }
+        break;
+
+      case "allmatches":
         if (gameType === "duo") {
           return "Total duo matches to date: " + duoStats.matches.value;
         } else {
@@ -206,7 +284,21 @@ module.exports = class FNscores {
         }
         break;
 
-      case "lastmatch":
+      case "matches":
+        if (gameType === "duo") {
+          return (
+            "Total duo matches this session: " +
+            (Number(duoStats.matches.value) - Number(storedStats.duo.matches))
+          );
+        } else {
+          return (
+            "Total solo matches this session: " +
+            (Number(soloStats.matches.value) - Number(storedStats.solo.matches))
+          );
+        }
+        break;
+
+      case "recent":
         //console.log(recentMatches[0]);
         //return "In progress...";
         return this.showLastMatch(recentMatches[0]);

@@ -32,6 +32,7 @@ client.on("connected", (address, port) => {
       );
     })
     .then(() => {
+      fortnite.storeInitialStats();
       if (autoRefresh) {
         autoRefresher();
       }
@@ -100,16 +101,21 @@ client.on("chat", (channel, user, message, self) => {
 
 //auto-call stats refresher
 const autoRefresher = () => {
-  client.action(
-    options.channels[0],
-    "Fetching new Fortnite stats, one moment..."
-  );
+  // client.action(
+  //   options.channels[0],
+  //   "Fetching new Fortnite stats, one moment..."
+  // );
+
   fortnite
     .refreshStats()
     .then(() => {
-      client.action(options.channels[0], "Stats updated!");
+      //client.action(options.channels[0], "Stats updated!");
+      console.log("api stats updated!");
     })
     .then(() => {
-      setTimeout(autoRefresher, 480000);
+      setTimeout(autoRefresher, 61000);
+    })
+    .catch(e => {
+      console.log("error", e);
     });
 };

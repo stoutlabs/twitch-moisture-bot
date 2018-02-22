@@ -1,13 +1,13 @@
 # Moisture_Bot
 
-[![nodejs](https://img.shields.io/badge/node.js-9.2.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
+[![nodejs](https://img.shields.io/badge/node.js-8.5.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
 [![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](paypal.me/stoutlabs/1.99)
 
 A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.P., use at your own risk!!
 
 ### Requirements
 
-1. Node.js (version 8.0.2 or higher) installed on your computer. [Get Node.js Here](https://nodejs.org/en/download/)
+1. Node.js (version 8.5.0 or higher) installed on your computer. [Get Node.js Here](https://nodejs.org/en/download/)
 2. [A twitch account for your new bot.](https://twitch.tv/)
 3. The twitch oauth token for your bot's account. [Get one here](https://twitchapps.com/tmi/)
 4. A Fortnite Tracker [api key](https://fortnitetracker.com/site-api)
