@@ -61,11 +61,8 @@ module.exports = class FNscores {
       }
     };
 
-    if (fs.writeFileSync(storagefile, JSON.stringify(initialData))) {
-      return true;
-    } else {
-      return "Error saving initial data.";
-    }
+    fs.writeFileSync(storagefile, JSON.stringify(initialData));
+    return "New session data saved!";
   }
 
   refreshStats() {
@@ -224,14 +221,23 @@ module.exports = class FNscores {
 
     switch (statType) {
       case "help":
-        return "You can get the following stats: wins, wins duo, kills, kills duo, matches, matches duo, lastmatch";
+        return "You can get the following stats: allwins (solo/duo/total), allkills (solo/duo/total), wins (solo/duo), kills (solo/duo), matches (solo/duo), recent";
         break;
 
       case "allwins":
         if (gameType === "duo") {
           return "Total duo wins to date: " + duoStats.top1.value;
-        } else {
+        } else if (gameType === "solo") {
           return "Total solo wins to date: " + soloStats.top1.value;
+        } else if (gameType === "total") {
+          return (
+            "Total overall wins (solo, duo, and squad): " +
+            (Number(duoStats.top1.value) +
+              Number(soloStats.top1.value) +
+              Number(squadStats.top1.value))
+          );
+        } else {
+          return "Use 'allkills duo', 'allkills solo', or 'allkills total'";
         }
         break;
 
@@ -255,8 +261,15 @@ module.exports = class FNscores {
           return "Total duo kills to date: " + duoStats.kills.value;
         } else if (gameType === "solo") {
           return "Total solo kills to date: " + soloStats.kills.value;
+        } else if (gameType === "total") {
+          return (
+            "Total overall kills (solo, duo, and squad): " +
+            (Number(duoStats.kills.value) +
+              Number(soloStats.kills.value) +
+              Number(squadStats.kills.value))
+          );
         } else {
-          return "Use 'kills duo' or 'kills solo', that wasn't recognized.";
+          return "Use 'allkills duo', 'allkills solo', or 'allkills total'";
         }
         break;
 

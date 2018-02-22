@@ -28,14 +28,14 @@ client.on("connected", (address, port) => {
     .then(() => {
       client.action(
         options.channels[0],
-        "Type !mbhelp or !getstats help to get commands."
+        "Type !mbhelp or !getstats help to get commands. Mods type !newsession to start a new stats session."
       );
     })
     .then(() => {
-      fortnite.storeInitialStats();
       if (autoRefresh) {
         autoRefresher();
       }
+      return;
     })
     .catch(e => {
       console.log("error: ", e);
@@ -71,6 +71,10 @@ client.on("chat", (channel, user, message, self) => {
 
       case "!mbhelp":
         client.action(channelName, fortnite.showHelp());
+        break;
+
+      case "!newsession":
+        client.action(channelName, fortnite.storeInitialStats());
         break;
 
       case "!refreshstats":
