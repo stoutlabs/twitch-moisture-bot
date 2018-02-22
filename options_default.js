@@ -13,7 +13,7 @@ var options = {
     password: "oauth:****YOUR twitch oauth KEY (for the account above)*****"
   },
   channels: ["your_channel_name"],
-  apiUrl: "https://api.fortnitetracker.com/v1/profile/pc/YOUR_EPIC_USERNAME",
+  apiURL: "https://api.fortnitetracker.com/v1/profile/pc/YOUR_EPIC_USERNAME",
   apiKey: "YOUR FORTNITE TRACKER API KEY"
 };
 

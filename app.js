@@ -5,28 +5,31 @@ const autoRefresh = true;
 
 //initialize our bot modes (currently just the fortnite mode)
 const fnscores = require("./modes/fortnite-scores.js");
-const fortnite = new fnscores({
-  apiURL: options.apiURL,
-  apiKey: options.apiKey
-});
+const fortnite = new fnscores(options.fortnite.apiURL, options.fortnite.apiKey);
 
 //connect to Twitch
 client.connect();
 
-//delay helper function, will move soon
+//delay helper promise fn, will move to a /lib soon
 function sleeper(ms) {
   return function(x) {
     return new Promise(resolve => setTimeout(() => resolve(x), ms));
   };
 }
 
-//optional connection message (you can delete or comment out if you want)
+//connection message
 client.on("connected", (address, port) => {
   client
-    .action(options.channels[0], "Moisture_Bot v1.1 - Online. DatSheffy")
+    .action(
+      options.channels[0],
+      "Moisture_Bot v0.9 Beta ::: Now Online DatSheffy"
+    )
     .then(sleeper(2000))
     .then(() => {
-      client.action(options.channels[0], "Type !mbhelp to get help.");
+      client.action(
+        options.channels[0],
+        "Type !mbhelp or !getstats help to get commands."
+      );
     })
     .then(() => {
       if (autoRefresh) {
@@ -39,6 +42,7 @@ client.on("connected", (address, port) => {
 });
 //---- end connection message ----
 
+//handle chat interactions
 client.on("chat", (channel, user, message, self) => {
   //ignore self
   //here

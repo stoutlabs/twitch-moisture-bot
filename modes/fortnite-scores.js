@@ -6,13 +6,13 @@ const datafile = path.join(__dirname, "fortnite-data.json");
 let myData = {};
 
 module.exports = class FNscores {
-  constructor() {
+  constructor(apiURL, apiKey) {
+    this.apiURL = apiURL;
+    this.apiKey = apiKey;
     this.solowins = 0;
     this.duowins = 0;
     this.solokills = 0;
     this.duokills = 0;
-    this.apiURL = ""; //set in app.js when intializing
-    this.apiKey = ""; //set in app.js when initializing
   }
 
   fetchData() {
@@ -28,11 +28,12 @@ module.exports = class FNscores {
     const _self = this;
     const theURL = this.apiURL;
     const theKey = this.apiKey;
+    console.log("theURL", theURL);
 
     return axios
-      .get("https://api.fortnitetracker.com/v1/profile/pc/whoswags", {
+      .get(theURL, {
         headers: {
-          "TRN-Api-Key": "5bf587ee-08b7-4db9-806a-5bed544b2cb7"
+          "TRN-Api-Key": theKey
         }
       })
       .then(function(response) {

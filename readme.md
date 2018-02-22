@@ -4,16 +4,17 @@ A Twitch bot used to track FortNite wins during a stream, fairly basic in functi
 
 #Requirements
 
-1. Node.js (8.0 or higher) running on your machine. (link here)
+1. Node.js (version 8.0.2 or higher) installed on your computer. (link here)
 2. A twitch account for your new bot. (link here)
 3. The twitch oauth token for your bot's account. (link here)
+4. An Epic Games api key (link here)
 
 #Installation Instructions
 
-* Install Node.js on your machine, if not installed already.
+* Install Node.js on your machine, if not installed already. (It's small and lightweight, it'll run on a potato!)
 * Download this repo into a directory of your choice
 * Edit the 'options.js' file
-  * Update the appropriate values for your twitch bot's account name and oauth token, channel, and apiURL/key
+  * Update the appropriate values for your twitch bot's account name and oauth token, channel, and Epic Games apiURL/key
 * Open a command prompt in the directory (In Windows, right click and select "open command prompt here")
 * At the prompt, type: npm install
 * Your bot is now ready to be run! (You only have to run the above command once.)
