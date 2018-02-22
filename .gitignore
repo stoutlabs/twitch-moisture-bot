@@ -1,4 +1,4 @@
-.vscode/
+/.vscode
 node_modules
 modes/fortnite-data.json
 modes/fortnite-stored.json
