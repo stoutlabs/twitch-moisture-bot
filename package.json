@@ -1,0 +1,12 @@
+{
+  "name": "moisture-bot",
+  "version": "1.0.0",
+  "main": "app.js",
+  "author": "StoutLabs",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "path": "^0.12.7",
+    "tmi.js": "^1.2.1"
+  }
+}
