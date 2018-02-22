@@ -28,9 +28,7 @@ A Twitch bot used to track FortNite wins during a stream, fairly basic in functi
 
 ### Current Requests/To-Dos
 
-* Track Kills (e.g. !addwin duo 8 would add a duos win with 8 kills)
-* Get Fortnite tracker API connected & build some call requests to it (To pull wins/kills/etc from that instead of needing to enter manually)
-* Add storage/cache + delayed interval to call stats API
+* Connect to Last.Fm to pull current song playing (new mode)
 
 ### Special Thanks
 
