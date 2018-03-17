@@ -90,80 +90,8 @@ module.exports = class FNscores {
       });
   }
 
-  addWin(winType = "solo", numkills = 0) {
-    let msg = "";
-
-    numkills = Number(numkills);
-
-    if (winType === "duo") {
-      this.duowins++;
-      this.duokills += numkills;
-      msg = "Duos wins increased! ";
-    } else {
-      this.solowins++;
-      this.solokills += numkills;
-      msg = "Solo wins increased! ";
-    }
-
-    msg += `We now have ${this.solowins} solo and ${
-      this.duowins
-    } duos wins in Fortnite today!! ${
-      this.solokills
-    } fools have been toasted in solo play, and ${this.duokills} in duos.`;
-
-    //extra memes
-    if (Number(this.duowins) + Number(this.solowins) > 4) {
-      msg += " PogChamp";
-    }
-
-    return msg;
-  }
-
-  editWins(winType, val) {
-    const errorMsg = "Here's an example: !editscore duo 4";
-
-    if (!Number.isInteger(Number(val))) {
-      return "That's not a number, dude! " + errorMsg;
-    }
-
-    if (winType == "solo") {
-      this.solowins = val;
-      return "Solo wins updated, now set to: " + this.solowins;
-    } else if (winType === "duo") {
-      this.duowins = val;
-      return "Duos wins updated, now set to: " + this.duowins;
-    } else {
-      return "Ayyy, wiseguy - only 'solo' and 'duo' are in use. " + errorMsg;
-    }
-  }
-
-  resetWins() {
-    this.solowins = this.duowins = 0;
-    return "Wins reset! Use '!addwin solo [kills]' and '!addwin duo [kills]' to add more.";
-  }
-
   showHelp() {
-    return "Use '!addwin solo [kills]' and '!addwin duo [kills]' to add wins, '!editwins [solo/duo] [amount]' to edit wins, and '!resetwins' to reset wins.";
-  }
-
-  showWins() {
-    let msg = `We now have ${this.solowins} solo and ${
-      this.duowins
-    } duos wins today!! ${
-      this.solokills
-    } fools have been toasted in solo play, and ${this.duokills} in duos.`;
-
-    //extra memes
-    if (Number(this.duowins) + Number(this.solowins) > 4) {
-      console.log(Number(this.duowins) + Number(this.solowins));
-      msg += " PogChamp";
-    }
-    if (Number(this.duowins) + Number(this.solowins) > 9) {
-      console.log(Number(this.duowins) + Number(this.solowins));
-      msg += " DatSheffy";
-    }
-
-    return msg;
+    return "Type '!getstats help' for a list of fortnite stats commands. More coming soon...";
   }
 
   //fortnite tracking stuff
@@ -179,9 +107,9 @@ module.exports = class FNscores {
       matchType = "solo";
     }
 
-    const matches = matchData.matches;
-    const wins = matchData.top1;
-    const top5 = matchData.top5;
+    const matches = Number(matchData.matches);
+    const wins = Number(matchData.top1);
+    const top5 = Number(matchData.top5);
     const top5Diff = wins - top5;
 
     if (top5 > 0) {
@@ -192,7 +120,7 @@ module.exports = class FNscores {
     }
 
     if (wins > 0) {
-      placement += ` ${wins} + wins!`;
+      placement += ` ${wins} wins!`;
     }
 
     if (wins == 0 && top5 == 0) {
@@ -316,12 +244,10 @@ module.exports = class FNscores {
           curMatchesSolo + curMatchesDuo + curMatchesSquad;
 
         curMatchesMessage = `Total matches this session: ${curMatchesBigTotal} (${curMatchesSolo} solo, ${curMatchesDuo} duo, ${curMatchesSquad} squad)`;
-        return curMatcheshMessage;
+        return curMatchesMessage;
         break;
 
       case "recent":
-        //console.log(recentMatches[0]);
-        //return "In progress...";
         return this.showLastMatch(recentMatches[0]);
         break;
 

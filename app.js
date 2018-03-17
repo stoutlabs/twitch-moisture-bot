@@ -22,13 +22,13 @@ client.on("connected", (address, port) => {
   client
     .action(
       options.channels[0],
-      "Moisture_Bot v0.9 Beta ::: Now Online DatSheffy"
+      "Moisture_Bot v0.9b Beta ::: Now Online DatSheffy"
     )
     .then(sleeper(2000))
     .then(() => {
       client.action(
         options.channels[0],
-        "Type !mbhelp or !getstats help to get commands. Mods type !newsession to start a new stats session."
+        "Type !mbhelp to get commands. Mods can type !newsession to start a new stats session."
       );
     })
     .then(() => {
@@ -57,18 +57,6 @@ client.on("chat", (channel, user, message, self) => {
   //moderator commands list
   if (user.mod || user.username === channelName) {
     switch (msgArray[0]) {
-      case "!addwin":
-        client.action(channelName, fortnite.addWin(msgArray[1], msgArray[2]));
-        break;
-
-      case "!editwins":
-        client.action(channelName, fortnite.editWins(msgArray[1], msgArray[2]));
-        break;
-
-      case "!resetwins":
-        client.action(channelName, fortnite.resetWins());
-        break;
-
       case "!mbhelp":
         client.action(channelName, fortnite.showHelp());
         break;
@@ -105,11 +93,6 @@ client.on("chat", (channel, user, message, self) => {
 
 //auto-call stats refresher
 const autoRefresher = () => {
-  // client.action(
-  //   options.channels[0],
-  //   "Fetching new Fortnite stats, one moment..."
-  // );
-
   fortnite
     .refreshStats()
     .then(() => {
