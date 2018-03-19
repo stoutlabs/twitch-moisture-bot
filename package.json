@@ -4,6 +4,9 @@
   "main": "app.js",
   "author": "StoutLabs",
   "license": "MIT",
+  "scripts": {
+    "start": "node app.js"
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "dot-env": "^0.0.1",
