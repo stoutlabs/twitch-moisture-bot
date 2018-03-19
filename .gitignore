@@ -2,7 +2,7 @@
 node_modules
 modes/fortnite-data.json
 modes/fortnite-stored.json
-options.default.js
+options_default.js
 devnotes.txt
 .env
 *.log
