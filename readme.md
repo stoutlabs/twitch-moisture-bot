@@ -2,7 +2,7 @@
 
 [![nodejs](https://img.shields.io/badge/node.js-8.5.0-brightgreen.svg?style=flat-square)](https://nodejs.org/en/)
 [![Build Status](https://travis-ci.org/stoutlabs/twitch-moisture-bot.svg?branch=master)](https://travis-ci.org/stoutlabs/twitch-moisture-bot)
-[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](paypal.me/stoutlabs/5.00)
+[![Donate](https://img.shields.io/badge/paypal-donate-yellow.svg?style=flat-square)](https://paypal.me/stoutlabs/5.00)
 
 A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.P., use at your own risk!!
 
