@@ -19,27 +19,26 @@ function sleeper(ms) {
 
 //connection message
 client.on("connected", (address, port) => {
-  client
-    .action(
-      options.channels[0],
-      "Moisture_Bot v0.9b Beta ::: Now Online DatSheffy"
-    )
-    .then(sleeper(2000))
-    .then(() => {
-      client.action(
-        options.channels[0],
-        "Type !mbhelp to get commands. Mods can type !newsession to start a new stats session."
-      );
-    })
-    .then(() => {
-      if (autoRefresh) {
-        autoRefresher();
-      }
-      return;
-    })
-    .catch(e => {
-      console.log("error: ", e);
-    });
+  if (options.announce.connect) {
+    client
+      .action(options.channels[0], "Moisture_Bot v0.9b Beta ::: Now Online DatSheffy")
+      .then(sleeper(2000))
+      .then(() => {
+        client.action(
+          options.channels[0],
+          "Type !help to get commands. Mods can type !newsession to start a new stats session."
+        );
+      })
+      .then(() => {
+        if (autoRefresh) {
+          autoRefresher();
+        }
+        return;
+      })
+      .catch(e => {
+        console.log("error: ", e);
+      });
+  }
 });
 //---- end connection message ----
 
@@ -57,7 +56,7 @@ client.on("chat", (channel, user, message, self) => {
   //moderator commands list
   if (user.mod || user.username === channelName) {
     switch (msgArray[0]) {
-      case "!mbhelp":
+      case "!help":
         client.action(channelName, fortnite.showHelp());
         break;
 
@@ -66,10 +65,7 @@ client.on("chat", (channel, user, message, self) => {
         break;
 
       case "!refreshstats":
-        client.action(
-          channelName,
-          "Fetching new Fortnite stats, one moment..."
-        );
+        client.action(channelName, "Fetching new Fortnite stats, one moment...");
         //fortnite.refreshStats();
         fortnite.refreshStats().then(() => {
           client.action(channelName, "Stats updated!");
@@ -83,6 +79,10 @@ client.on("chat", (channel, user, message, self) => {
   switch (msgArray[0]) {
     case "!wins":
       client.action(channelName, fortnite.getStats("wins"));
+      break;
+
+    case "!kills":
+      client.action(channelName, fortnite.getStats("kills"));
       break;
 
     case "!getstats":

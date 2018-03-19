@@ -129,7 +129,7 @@ module.exports = class FNscores {
 
     let matchMsg = `In the past ${matches} rounds, we were running the ${matchType} playlist. We killed ${
       matchData.kills
-    } poor souls, and finished with: ${placement}.`;
+    } poor souls, and finished with ${placement}`;
     return matchMsg;
   }
 
@@ -154,13 +154,11 @@ module.exports = class FNscores {
       case "allwins":
         let allWinsMessage = "";
         const allWinsBigTotal =
-          Number(duoStats.top1.value) +
-          Number(soloStats.top1.value) +
-          Number(squadStats.top1.value);
+          Number(duoStats.top1.value) + Number(soloStats.top1.value) + Number(squadStats.top1.value);
 
-        allWinsMessage = `Total overall wins: ${soloStats.top1.value} solo, ${
-          duoStats.top1.value
-        } duo, and ${squadStats.top1.value} squad. Total combined: `;
+        allWinsMessage = `Total overall wins: ${soloStats.top1.value} solo, ${duoStats.top1.value} duo, and ${
+          squadStats.top1.value
+        } squad. Total combined: `;
         allWinsMessage += allWinsBigTotal;
 
         return allWinsMessage;
@@ -169,12 +167,9 @@ module.exports = class FNscores {
       case "wins":
         let winsMessage = "";
 
-        const winsSolo =
-          Number(soloStats.top1.value) - Number(storedStats.solo.top1);
-        const winsDuo =
-          Number(duoStats.top1.value) - Number(storedStats.duo.top1);
-        const winsSquad =
-          Number(squadStats.top1.value) - Number(storedStats.squad.top1);
+        const winsSolo = Number(soloStats.top1.value) - Number(storedStats.solo.top1);
+        const winsDuo = Number(duoStats.top1.value) - Number(storedStats.duo.top1);
+        const winsSquad = Number(squadStats.top1.value) - Number(storedStats.squad.top1);
         const winsTot = winsSolo + winsDuo + winsSquad;
 
         winsMessage += `Total wins this session: ${winsTot} (${winsSolo} solo, ${winsDuo} duo, ${winsSquad} squad)`;
@@ -206,12 +201,9 @@ module.exports = class FNscores {
 
       case "kills":
         let curKillsMessage = "";
-        const curKillsSolo =
-          Number(soloStats.kills.value) - Number(storedStats.solo.kills);
-        const curKillsDuo =
-          Number(duoStats.kills.value) - Number(storedStats.duo.kills);
-        const curKillsSquad =
-          Number(squadStats.kills.value) - Number(storedStats.squad.kills);
+        const curKillsSolo = Number(soloStats.kills.value) - Number(storedStats.solo.kills);
+        const curKillsDuo = Number(duoStats.kills.value) - Number(storedStats.duo.kills);
+        const curKillsSquad = Number(squadStats.kills.value) - Number(storedStats.squad.kills);
         const curKillsBigTotal = curKillsSolo + curKillsDuo + curKillsSquad;
 
         curKillsMessage = `Total kills this session: ${curKillsBigTotal} (${curKillsSolo} solo, ${curKillsDuo} duo, and ${curKillsSquad} squad)`;
@@ -224,8 +216,7 @@ module.exports = class FNscores {
         const allMatchesSolo = Number(soloStats.matches.value);
         const allMatchesDuo = Number(duoStats.matches.value);
         const allMatchesSquad = Number(squadStats.matches.value);
-        const allMatchesBigTotal =
-          allMatchesSolo + allMatchesDuo + allMatchesSquad;
+        const allMatchesBigTotal = allMatchesSolo + allMatchesDuo + allMatchesSquad;
 
         allMatchesMessage = `Total matches to date: ${allMatchesBigTotal} (${allMatchesSolo} solo, ${allMatchesDuo} duo, ${allMatchesSquad} squad)`;
 
@@ -234,14 +225,10 @@ module.exports = class FNscores {
 
       case "matches":
         let curMatchesMessage = "";
-        const curMatchesSolo =
-          Number(soloStats.matches.value) - Number(storedStats.solo.matches);
-        const curMatchesDuo =
-          Number(duoStats.matches.value) - Number(storedStats.duo.matches);
-        const curMatchesSquad =
-          Number(squadStats.matches.value) - Number(storedStats.squad.matches);
-        const curMatchesBigTotal =
-          curMatchesSolo + curMatchesDuo + curMatchesSquad;
+        const curMatchesSolo = Number(soloStats.matches.value) - Number(storedStats.solo.matches);
+        const curMatchesDuo = Number(duoStats.matches.value) - Number(storedStats.duo.matches);
+        const curMatchesSquad = Number(squadStats.matches.value) - Number(storedStats.squad.matches);
+        const curMatchesBigTotal = curMatchesSolo + curMatchesDuo + curMatchesSquad;
 
         curMatchesMessage = `Total matches this session: ${curMatchesBigTotal} (${curMatchesSolo} solo, ${curMatchesDuo} duo, ${curMatchesSquad} squad)`;
         return curMatchesMessage;
