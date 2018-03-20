@@ -148,7 +148,7 @@ module.exports = class FNscores {
 
     switch (statType) {
       case "help":
-        return "You can get the following stats: allwins, allkills, allmatches, wins, kills, matches, recent";
+        return "Usage: !getstats <stat>. You can get the following stats: allwins, allkills, allmatches, wins, kills, matches, recent. Example: !getstats allkills";
         break;
 
       case "allwins":
@@ -182,6 +182,12 @@ module.exports = class FNscores {
         //add big win memes
         if (winsTot > 5) {
           winsMessage += " PogChamp";
+        }
+        if (winsTot > 10) {
+          winsMessage += " r6rekt";
+        }
+        if (winsTot > 15) {
+          winsMessage += " CurseLit";
         }
 
         return winsMessage;
