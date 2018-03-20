@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const tmi = require("tmi.js");
 const options = require("./options.js");
 const client = new tmi.client(options);

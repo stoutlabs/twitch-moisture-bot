@@ -1,7 +1,3 @@
-require("dotenv").config();
-
-//update the username and password with your bot's own values, or this will not work.
-//you can change the channel that you want to use it in, too
 var options = {
   options: {
     debug: true
