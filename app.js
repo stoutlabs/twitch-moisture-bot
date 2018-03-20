@@ -59,7 +59,7 @@ client.on("chat", (channel, user, message, self) => {
   if (user.mod || user.username === channelName) {
     switch (msgArray[0]) {
       case "!help":
-        client.action(channelName, fortnite.showHelp());
+        client.action(channelName, fortnite.getStats("help"));
         break;
 
       case "!newsession":
