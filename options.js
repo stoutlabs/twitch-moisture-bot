@@ -27,7 +27,7 @@ const options = {
     },
     moisturetimer: {
       enabled: true,
-      mins: 2
+      mins: 60
     }
   }
 };
