@@ -1,15 +1,18 @@
 require("dotenv").config();
-
 const tmi = require("tmi.js");
 const options = require("./options.js");
-const client = new tmi.client(options);
 const autoRefresh = true;
 
-//initialize our bot modes (currently just the fortnite mode)
+//initialize our bot modes
+// fortnite tracking mode
 const fnscores = require("./modes/fortnite-scores.js");
 const fortnite = new fnscores(options.fortnite.apiURL, options.fortnite.apiKey);
 
+// lastFM (current/prev song) mode
+const lastFM = require("./modes/lastfm");
+
 //connect to Twitch
+const client = new tmi.client(options);
 client.connect();
 
 //delay helper promise fn, will move to a /lib soon
@@ -31,15 +34,17 @@ client.on("connected", (address, port) => {
           "Type !help to get commands. Mods can type !newsession to start a new stats session."
         );
       })
-      .then(() => {
-        if (autoRefresh) {
-          autoRefresher();
-        }
-        return;
-      })
       .catch(e => {
         console.log("error: ", e);
       });
+  }
+  if (autoRefresh) {
+    autoRefresher();
+  }
+  if (options.modes.moisturetimer.enabled) {
+    const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
+    setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
+    //moistureTimer();
   }
 });
 //---- end connection message ----
@@ -91,6 +96,41 @@ client.on("chat", (channel, user, message, self) => {
       client.action(channelName, fortnite.getStats(msgArray[1], msgArray[2]));
       break;
   }
+
+  if (options.modes.lastfm.enabled) {
+    switch (msgArray[0]) {
+      case "!song":
+        lastFM
+          .fetchSong()
+          .then(track => {
+            const artist = Object.values(track.artist)[0];
+            const album = Object.values(track.album)[0];
+            const song = track.name;
+            const songMsg = `${artist} - ${song} (${album})`;
+            client.action(channelName, songMsg);
+          })
+          .catch(e => {
+            console.log("fetchSong error:", e);
+          });
+
+        break;
+
+      case "!lastsong":
+        lastFM
+          .fetchLastSong()
+          .then(track => {
+            const pArtist = Object.values(track.artist)[0];
+            const pAlbum = Object.values(track.album)[0];
+            const pSong = track.name;
+            const pSongMsg = `${pArtist} - ${pSong} (${pAlbum})`;
+            client.action(channelName, pSongMsg);
+          })
+          .catch(e => {
+            console.log("fetchSong error:", e);
+          });
+        break;
+    }
+  }
 });
 
 //auto-call stats refresher
@@ -106,5 +146,20 @@ const autoRefresher = () => {
     })
     .catch(e => {
       console.log("error", e);
+    });
+};
+
+//moisture timer
+const moistureTimer = minutes => {
+  const millsecs = minutes * 60 * 1000;
+  const channelName = options.channels[0];
+
+  client
+    .action(channelName, `${minutes} minutes have passed, strimmer! Moisturize! DrinkPurple`)
+    .then(() => {
+      setTimeout(moistureTimer, millsecs, minutes);
+    })
+    .catch(e => {
+      console.log("moistureTimer error:", e);
     });
 };

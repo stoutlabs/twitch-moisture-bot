@@ -1,4 +1,4 @@
-var options = {
+const options = {
   options: {
     debug: true
   },
@@ -17,6 +17,18 @@ var options = {
   },
   announce: {
     connect: false
+  },
+  modes: {
+    lastfm: {
+      enabled: true,
+      apiKey: process.env.MB_LASTFM_APIKEY,
+      apiSecret: process.env.MB_LASTFM_APISECRET,
+      username: "whoswags"
+    },
+    moisturetimer: {
+      enabled: true,
+      mins: 2
+    }
   }
 };
 
