@@ -11,6 +11,9 @@ const fortnite = new fnscores(options.fortnite.apiURL, options.fortnite.apiKey);
 // lastFM (current/prev song) mode
 const lastFM = require("./modes/lastfm");
 
+// moisture reminder var(s)
+let moistureTimerID = undefined;
+
 //connect to Twitch
 const client = new tmi.client(options);
 client.connect();
@@ -43,7 +46,7 @@ client.on("connected", (address, port) => {
   }
   if (options.modes.moisturetimer.enabled) {
     const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
-    setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
+    moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
     //moistureTimer();
   }
 });
@@ -77,7 +80,16 @@ client.on("chat", (channel, user, message, self) => {
         fortnite.refreshStats().then(() => {
           client.action(channelName, "Stats updated!");
         });
-
+        break;
+      case "!startmoisture":
+        clearTimeout(moistureTimerID);
+        const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
+        moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
+        client.action(channelName, "Moisture timer (re)started! Type !stopmoisture to end.");
+        break;
+      case "!stopmoisture":
+        clearTimeout(moistureTimerID);
+        client.action(channelName, "Moisture reminders now off. Type !startmoisture to restart timer.");
         break;
     }
   }
@@ -149,15 +161,19 @@ const autoRefresher = () => {
     });
 };
 
-//moisture timer
+//moisture timer stuff
+const moistureMessage = mins => {
+  return `${mins} minutes have passed, strimmer! Moisturize! DrinkPurple`;
+};
+
 const moistureTimer = minutes => {
   const millsecs = minutes * 60 * 1000;
   const channelName = options.channels[0];
 
   client
-    .action(channelName, `${minutes} minutes have passed, strimmer! Moisturize! DrinkPurple`)
+    .action(channelName, moistureMessage(minutes))
     .then(() => {
-      setTimeout(moistureTimer, millsecs, minutes);
+      moistureTimerID = setTimeout(moistureTimer, millsecs, minutes);
     })
     .catch(e => {
       console.log("moistureTimer error:", e);
