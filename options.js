@@ -11,6 +11,7 @@ const options = {
     password: process.env.MB_TWITCH_AUTH
   },
   channels: [process.env.MB_TWITCH_CHANNEL],
+  client_id: process.env.MB_TWITCH_CLIENTID,
   fortnite: {
     apiURL: process.env.MB_API_URL,
     apiKey: process.env.MB_API_KEY

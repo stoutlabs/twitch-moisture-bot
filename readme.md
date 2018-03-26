@@ -13,7 +13,9 @@ A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.
 1.  Node.js (version 8.5.0 or higher) installed on your computer. [Get Node.js Here](https://nodejs.org/en/download/)
 2.  [A twitch account for your new bot.](https://twitch.tv/)
 3.  The twitch oauth token for your bot's account. [Get one here](https://twitchapps.com/tmi/)
-4.  A Fortnite Tracker [api key](https://fortnitetracker.com/site-api)
+4.  To enable direct calls to the Twitch API (to check if the stream is live), we also need an app Client ID from Twitch. Go to [dev.twitch.tv](https://dev.twitch.tv/), and make a new app. I called mine 'MoistureBot ChannelStatus'. All you really need is the 'client ID'. (Note: I suspect that I may have done something wrong here... as one would think we could use the OAuth token above for this too. I'm looking into it, but this will work for now.)
+5.  A Fortnite Tracker [api key](https://fortnitetracker.com/site-api)
+6.  If the Last.FM mode is desired, you will need to [get a Last.fm API key](https://www.last.fm/api/account/create) too.
 
 ### Installation Instructions
 
@@ -24,17 +26,17 @@ A basic Twitch bot, currently used to track FortNite stats during a stream. W.I.
 5.  Open a command prompt in the directory (In Windows, right click and select "open command prompt here")
 6.  At the prompt, type: npm install
 7.  Your bot is now ready to be run! (Note: You only have to do these steps once.)
+8.  Note: If you plan to host this on a server, all of the .env file values need to be added to your server's environment variables. There are many ways to do this, depending on your server setup... google is your friend. (In my case, on Ubuntu 16.04, those are stored in /etc/environment. I simply edit those values and then logout/login to get those updated vars into my user's environment... and then restart the bot.)
 
 ### Usage
 
-* Running the bot is easy! Open a command prompt from the directory your bot is in, and type: node app.js
+* Running the bot is easy! Open a command prompt from the directory your bot is in, and type: node app.js (or npm start)
 * You should see some connection messages appear there, and you should also see your bot running in your channel's chat!
-* I'll update this soon! See the code for now, or type !help or !getstats help in your chat
+* I'll continue updating this as I have time! See the code for now, or type !help or !getstats help in your chat
 * You can stop the bot at any time by pressing CTRL+C in the command prompt window, or by just closing the window.
 
 ### Current Requests/To-Dos
 
-* Connect to Last.Fm to pull current song playing (new mode)
 * Browser interface
 * Much much more... this is just the start!
 

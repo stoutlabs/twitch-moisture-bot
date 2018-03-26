@@ -1,7 +1,12 @@
 require("dotenv").config();
 const tmi = require("tmi.js");
+const axios = require("axios");
+
 const options = require("./options.js");
 const autoRefreshStats = true;
+
+let streamIsLive = false;
+let isLiveTimerID = undefined;
 
 //initialize our bot modes
 // fortnite tracking mode
@@ -101,6 +106,13 @@ client.on("chat", (channel, user, message, self) => {
         clearTimeout(fortniteTimerID);
         client.action(channelName, "Fortnite stats tracking stopped. Type !startstats to restart.");
         break;
+      case "!channelstatus":
+        // const status = checkChannelStatus()
+        //   .then(result => {
+
+        //   });
+        checkChannelStatus();
+        break;
     }
   }
 
@@ -159,7 +171,11 @@ client.on("chat", (channel, user, message, self) => {
   }
 });
 
-//auto-call stats refresher
+// ----------------------
+// Util functions
+// ----------------------
+
+//fortnite recursive stats refresher
 const fortniteAutoStats = () => {
   fortnite
     .refreshStats()
@@ -175,7 +191,7 @@ const fortniteAutoStats = () => {
     });
 };
 
-//moisture timer stuff
+//moisture reminders recursive timer
 const moistureMessage = mins => {
   return `${mins} minutes have passed, strimmer! Moisturize! DrinkPurple`;
 };
@@ -191,5 +207,41 @@ const moistureTimer = minutes => {
     })
     .catch(e => {
       console.log("moistureTimer error:", e);
+    });
+};
+
+//check if channel is live (testing this out...)
+const checkChannelStatus = () => {
+  let channelName = options.channels[0];
+
+  if (channelName.charAt(0) === "#") {
+    channelName = channelName.replace(/^#/, "");
+  }
+
+  axios
+    .get(`https://api.twitch.tv/kraken/streams/${channelName}?client_id=${options.client_id}`)
+    .then(results => {
+      if (results.data.stream !== null && streamIsLive === false) {
+        //console.log("results: ", results.data.stream);
+        let newStreamMsg = `Stream recently went live - hello, @${channelName}.`;
+        //restart fortnite stats if the game == fortnite
+        if (results.data.stream.game === "Fortnite") {
+          newStreamMsg += ` Fortnite is detected, so I'm restarting the stats tracker for you. Type !newsession if this is a new stream!`;
+          clearTimeout(fortniteTimerID);
+          fortniteAutoStats();
+        }
+        client.action(channelName, newStreamMsg);
+        streamIsLive = true;
+      } else {
+        //console.log("Stream is not live");
+        clearTimeout(fortniteTimerID);
+        streamIsLive = false;
+      }
+
+      // start recursive calls to this function (every 5 mins)
+      isLiveTimerID = setTimeout(checkChannelStatus, 5 * 60 * 1000);
+    })
+    .catch(e => {
+      console.log("error getting live status: ", e);
     });
 };
