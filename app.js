@@ -1,12 +1,13 @@
 require("dotenv").config();
 const tmi = require("tmi.js");
 const options = require("./options.js");
-const autoRefresh = true;
+const autoRefreshStats = true;
 
 //initialize our bot modes
 // fortnite tracking mode
 const fnscores = require("./modes/fortnite-scores.js");
 const fortnite = new fnscores(options.fortnite.apiURL, options.fortnite.apiKey);
+let fortniteTimerID = undefined;
 
 // lastFM (current/prev song) mode
 const lastFM = require("./modes/lastfm");
@@ -29,7 +30,7 @@ function sleeper(ms) {
 client.on("connected", (address, port) => {
   if (options.announce.connect) {
     client
-      .action(options.channels[0], "Moisture_Bot v0.9b Beta ::: Now Online DatSheffy")
+      .action(options.channels[0], "Moisture_Bot v1.1 ::: Now Online DatSheffy")
       .then(sleeper(2000))
       .then(() => {
         client.action(
@@ -41,8 +42,8 @@ client.on("connected", (address, port) => {
         console.log("error: ", e);
       });
   }
-  if (autoRefresh) {
-    autoRefresher();
+  if (autoRefreshStats) {
+    fortniteTimerID = setTimeout(fortniteAutoStats, 65000);
   }
   if (options.modes.moisturetimer.enabled) {
     const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
@@ -66,10 +67,6 @@ client.on("chat", (channel, user, message, self) => {
   //moderator commands list
   if (user.mod || user.username === channelName) {
     switch (msgArray[0]) {
-      case "!help":
-        client.action(channelName, fortnite.getStats("help"));
-        break;
-
       case "!newsession":
         client.action(channelName, fortnite.storeInitialStats());
         break;
@@ -81,21 +78,38 @@ client.on("chat", (channel, user, message, self) => {
           client.action(channelName, "Stats updated!");
         });
         break;
+
       case "!startmoisture":
         clearTimeout(moistureTimerID);
         const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
         moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
         client.action(channelName, "Moisture timer (re)started! Type !stopmoisture to end.");
         break;
+
       case "!stopmoisture":
         clearTimeout(moistureTimerID);
         client.action(channelName, "Moisture reminders now off. Type !startmoisture to restart timer.");
+        break;
+
+      case "!startstats":
+        clearTimeout(fortniteTimerID);
+        fortniteTimerID = setTimeout(fortniteAutoStats, 65000);
+        client.action(channelName, "Fortnite stats tracking (re)started! Type !stopstats to end.");
+        break;
+
+      case "!stopstats":
+        clearTimeout(fortniteTimerID);
+        client.action(channelName, "Fortnite stats tracking stopped. Type !startstats to restart.");
         break;
     }
   }
 
   //all users commands list
   switch (msgArray[0]) {
+    case "!help":
+      client.action(channelName, fortnite.getStats("help"));
+      break;
+
     case "!wins":
       client.action(channelName, fortnite.getStats("wins"));
       break;
@@ -146,7 +160,7 @@ client.on("chat", (channel, user, message, self) => {
 });
 
 //auto-call stats refresher
-const autoRefresher = () => {
+const fortniteAutoStats = () => {
   fortnite
     .refreshStats()
     .then(() => {
@@ -154,7 +168,7 @@ const autoRefresher = () => {
       console.log("api stats updated!");
     })
     .then(() => {
-      setTimeout(autoRefresher, 61000);
+      fortniteTimerID = setTimeout(fortniteAutoStats, 65000);
     })
     .catch(e => {
       console.log("error", e);
