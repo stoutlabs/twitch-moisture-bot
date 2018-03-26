@@ -5,7 +5,7 @@ const axios = require("axios");
 const options = require("./options.js");
 const autoRefreshStats = true;
 
-let streamIsLive = false;
+let streamIsLive = true;
 let isLiveTimerID = undefined;
 
 // fortnite tracking mode vars
@@ -46,6 +46,7 @@ client.on("connected", (address, port) => {
   if (options.modes.moisturetimer.enabled) {
     moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
   }
+  checkChannelStatus();
 });
 //---- end connection message ----
 
@@ -214,7 +215,7 @@ const checkChannelStatus = () => {
     .get(`https://api.twitch.tv/kraken/streams/${channelName}?client_id=${options.client_id}`)
     .then(results => {
       if (results.data.stream !== null && streamIsLive === false) {
-        let newStreamMsg = `Stream recently went live - hello, @${channelName}.`;
+        let newStreamMsg = `Stream recently went live - hello, @${channelName}!`;
 
         // restart fortnite stats if the game == fortnite
         if (results.data.stream.game === "Fortnite") {
@@ -231,10 +232,13 @@ const checkChannelStatus = () => {
 
         client.action(channelName, newStreamMsg);
         streamIsLive = true;
-      } else if (results.data.stream === null) {
-        //console.log("Stream is not live");
+      } else if (results.data.stream === null && streamIsLive === true) {
+        // if stream recently went offline, do these:
         clearTimeout(fortniteTimerID);
         clearTimeout(moistureTimerID);
+        const shutdownMsg =
+          "The stream appears to be offline. Shutting down Fortnite tracker auto-updates and moisture reminders. I'll check back every 5 minutes...";
+        client.action(channelName, shutdownMsg);
         streamIsLive = false;
       }
 

@@ -69,7 +69,7 @@ module.exports = class FNscores {
     const _self = this;
     const theURL = this.apiURL;
     const theKey = this.apiKey;
-    console.log("theURL", theURL);
+    //console.log("theURL", theURL);
 
     return axios
       .get(theURL, {
@@ -184,10 +184,10 @@ module.exports = class FNscores {
           winsMessage += " PogChamp";
         }
         if (winsTot > 10) {
-          winsMessage += " r6rekt";
+          winsMessage += " CurseLit";
         }
         if (winsTot > 15) {
-          winsMessage += " CurseLit";
+          winsMessage += " PogChamp";
         }
 
         return winsMessage;
