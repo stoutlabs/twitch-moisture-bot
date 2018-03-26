@@ -8,30 +8,23 @@ const autoRefreshStats = true;
 let streamIsLive = false;
 let isLiveTimerID = undefined;
 
-//initialize our bot modes
-// fortnite tracking mode
+// fortnite tracking mode vars
 const fnscores = require("./modes/fortnite-scores.js");
 const fortnite = new fnscores(options.fortnite.apiURL, options.fortnite.apiKey);
 let fortniteTimerID = undefined;
 
-// lastFM (current/prev song) mode
+// lastFM (current/prev song) mode vars
 const lastFM = require("./modes/lastfm");
 
-// moisture reminder var(s)
+// moisture reminder mode vars
 let moistureTimerID = undefined;
+const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
 
 //connect to Twitch
 const client = new tmi.client(options);
 client.connect();
 
-//delay helper promise fn, will move to a /lib soon
-function sleeper(ms) {
-  return function(x) {
-    return new Promise(resolve => setTimeout(() => resolve(x), ms));
-  };
-}
-
-//connection message
+//connection message/setup
 client.on("connected", (address, port) => {
   if (options.announce.connect) {
     client
@@ -51,17 +44,14 @@ client.on("connected", (address, port) => {
     fortniteTimerID = setTimeout(fortniteAutoStats, 65000);
   }
   if (options.modes.moisturetimer.enabled) {
-    const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
     moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
-    //moistureTimer();
   }
 });
 //---- end connection message ----
 
 //handle chat interactions
 client.on("chat", (channel, user, message, self) => {
-  //ignore self
-  //here
+  //ignore self here?
 
   //get broadcaster name here by removing # from the channel name, since they aren't usually listed as mods
   const channelName = channel.replace(/^#/, "");
@@ -107,10 +97,6 @@ client.on("chat", (channel, user, message, self) => {
         client.action(channelName, "Fortnite stats tracking stopped. Type !startstats to restart.");
         break;
       case "!channelstatus":
-        // const status = checkChannelStatus()
-        //   .then(result => {
-
-        //   });
         checkChannelStatus();
         break;
     }
@@ -175,6 +161,10 @@ client.on("chat", (channel, user, message, self) => {
 // Util functions
 // ----------------------
 
+const sleeper = ms => {
+  return x => new Promise(resolve => setTimeout(() => resolve(x), ms));
+};
+
 //fortnite recursive stats refresher
 const fortniteAutoStats = () => {
   fortnite
@@ -196,6 +186,7 @@ const moistureMessage = mins => {
   return `${mins} minutes have passed, strimmer! Moisturize! DrinkPurple`;
 };
 
+// moisture reminders recursive timer
 const moistureTimer = minutes => {
   const millsecs = minutes * 60 * 1000;
   const channelName = options.channels[0];
@@ -210,7 +201,7 @@ const moistureTimer = minutes => {
     });
 };
 
-//check if channel is live (testing this out...)
+// check if channel is live - this is all a bit messy for now, sorry!
 const checkChannelStatus = () => {
   let channelName = options.channels[0];
 
@@ -218,27 +209,36 @@ const checkChannelStatus = () => {
     channelName = channelName.replace(/^#/, "");
   }
 
+  // check Twitch API for 'stream' info. It returns null if stream is offline.
   axios
     .get(`https://api.twitch.tv/kraken/streams/${channelName}?client_id=${options.client_id}`)
     .then(results => {
       if (results.data.stream !== null && streamIsLive === false) {
-        //console.log("results: ", results.data.stream);
         let newStreamMsg = `Stream recently went live - hello, @${channelName}.`;
-        //restart fortnite stats if the game == fortnite
+
+        // restart fortnite stats if the game == fortnite
         if (results.data.stream.game === "Fortnite") {
-          newStreamMsg += ` Fortnite is detected, so I'm restarting the stats tracker for you. Type !newsession if this is a new stream!`;
+          newStreamMsg += ` Fortnite is detected, I'm restarting the stats tracker. Type !newsession if this is a new stream.`;
           clearTimeout(fortniteTimerID);
           fortniteAutoStats();
         }
+
+        // if moistureTimer is enabled, restart it too
+        if (options.modes.moisturetimer.enabled) {
+          newStreamMsg += ` I've also enabled the Moisture reminders for you. Type !stopmoisture to stop them.`;
+          moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
+        }
+
         client.action(channelName, newStreamMsg);
         streamIsLive = true;
-      } else {
+      } else if (results.data.stream === null) {
         //console.log("Stream is not live");
         clearTimeout(fortniteTimerID);
+        clearTimeout(moistureTimerID);
         streamIsLive = false;
       }
 
-      // start recursive calls to this function (every 5 mins)
+      // start recursive calls to this function (once every 5 mins should be good?)
       isLiveTimerID = setTimeout(checkChannelStatus, 5 * 60 * 1000);
     })
     .catch(e => {
