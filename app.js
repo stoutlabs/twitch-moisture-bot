@@ -241,11 +241,11 @@ const checkChannelStatus = () => {
         client.action(channelName, shutdownMsg);
         streamIsLive = false;
       }
-
-      // start recursive calls to this function (once every 5 mins should be good?)
-      isLiveTimerID = setTimeout(checkChannelStatus, 5 * 60 * 1000);
     })
     .catch(e => {
       console.log("error getting live status: ", e);
     });
+
+  // start recursive calls to this function (once every 5 mins should be good?)
+  isLiveTimerID = setTimeout(checkChannelStatus, 5 * 60 * 1000);
 };
