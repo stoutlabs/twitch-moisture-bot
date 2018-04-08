@@ -240,7 +240,7 @@ const checkChannelStatus = () => {
 
         client.action(channelName, newStreamMsg);
         streamIsLive = true;
-      } else {
+      } else if (results.data.stream === null) {
         // if stream was recently went online, do these:
         if (streamIsLive === true) {
           clearTimeout(fortniteTimerID);
