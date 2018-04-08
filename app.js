@@ -5,7 +5,7 @@ const axios = require("axios");
 const options = require("./options.js");
 const autoRefreshStats = true;
 
-let streamIsLive = true;
+let streamIsLive = false;
 let isLiveTimerID = undefined;
 
 // fortnite tracking mode vars
