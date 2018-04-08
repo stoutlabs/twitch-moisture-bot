@@ -76,7 +76,11 @@ client.on("chat", (channel, user, message, self) => {
         break;
 
       case "!startmoisture":
-        clearTimeout(moistureTimerID);
+        if (moistureTimerID !== undefined) {
+          clearTimeout(moistureTimerID);
+          moistureTimerID = undefined;
+        }
+
         const moistureTime = options.modes.moisturetimer.mins * 60 * 1000;
         moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
         client.action(channelName, "Moisture timer (re)started! Type !stopmoisture to end.");
@@ -95,6 +99,8 @@ client.on("chat", (channel, user, message, self) => {
 
       case "!stopstats":
         clearTimeout(fortniteTimerID);
+        fortniteTimerID = undefined;
+
         client.action(channelName, "Fortnite stats tracking stopped. Type !startstats to restart.");
         break;
       case "!channelstatus":
@@ -221,24 +227,33 @@ const checkChannelStatus = () => {
         if (results.data.stream.game === "Fortnite") {
           newStreamMsg += ` Fortnite is detected, I'm restarting the stats tracker. Type !newsession if this is a new stream.`;
           clearTimeout(fortniteTimerID);
+          fortniteTimerID = undefined;
           fortniteAutoStats();
         }
 
         // if moistureTimer is enabled, restart it too
         if (options.modes.moisturetimer.enabled) {
           newStreamMsg += ` I've also enabled the Moisture reminders for you. Type !stopmoisture to stop them.`;
+          clearTimeout(moistureTimerID);
           moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
         }
 
         client.action(channelName, newStreamMsg);
         streamIsLive = true;
-      } else if (results.data.stream === null && streamIsLive === true) {
-        // if stream recently went offline, do these:
-        clearTimeout(fortniteTimerID);
-        clearTimeout(moistureTimerID);
-        const shutdownMsg =
-          "The stream appears to be offline. Shutting down Fortnite tracker auto-updates and moisture reminders. I'll check back every 5 minutes...";
-        client.action(channelName, shutdownMsg);
+      } else {
+        // if stream was recently went online, do these:
+        if (streamIsLive === true) {
+          clearTimeout(fortniteTimerID);
+          fortniteTimerID = undefined;
+
+          clearTimeout(moistureTimerID);
+          moistureTimerID = undefined;
+
+          const shutdownMsg =
+            "The stream appears to be offline. Shutting down Fortnite tracker auto-updates and moisture reminders. I'll check back every 5 minutes...";
+          client.action(channelName, shutdownMsg);
+        }
+
         streamIsLive = false;
       }
     })
