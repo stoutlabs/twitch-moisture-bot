@@ -36,15 +36,10 @@ client.on("connected", (address, port) => {
           "Type !help to get commands. Mods can type !newsession to start a new stats session."
         );
       })
+      .then(sleeper(1250))
       .catch(e => {
         console.log("error: ", e);
       });
-  }
-  if (autoRefreshStats) {
-    fortniteTimerID = setTimeout(fortniteAutoStats, 65000);
-  }
-  if (options.modes.moisturetimer.enabled) {
-    moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
   }
   checkChannelStatus();
 });
@@ -88,7 +83,12 @@ client.on("chat", (channel, user, message, self) => {
 
       case "!stopmoisture":
         clearTimeout(moistureTimerID);
-        client.action(channelName, "Moisture reminders now off. Type !startmoisture to restart timer.");
+        moistureTimerID = undefined;
+
+        client.action(
+          channelName,
+          "Moisture reminders now off. Type !startmoisture to restart timer."
+        );
         break;
 
       case "!startstats":
@@ -208,58 +208,80 @@ const moistureTimer = minutes => {
     });
 };
 
+const checkIsLive = async (channel, clientID) => {
+  try {
+    const results = await axios.get(
+      `https://api.twitch.tv/kraken/streams/${channel}?client_id=${clientID}`
+    );
+
+    if (results.data.stream !== null) {
+      return results.data.stream;
+    } else {
+      return false;
+    }
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
+
 // check if channel is live - this is all a bit messy for now, sorry!
-const checkChannelStatus = () => {
+const checkChannelStatus = async () => {
   let channelName = options.channels[0];
 
   if (channelName.charAt(0) === "#") {
     channelName = channelName.replace(/^#/, "");
   }
 
-  // check Twitch API for 'stream' info. It returns null if stream is offline.
-  axios
-    .get(`https://api.twitch.tv/kraken/streams/${channelName}?client_id=${options.client_id}`)
-    .then(results => {
-      if (results.data.stream !== null && streamIsLive === false) {
-        let newStreamMsg = `Stream recently went live - hello, @${channelName}!`;
+  // check if channel is live
+  const liveData = await checkIsLive(channelName, options.client_id);
 
-        // restart fortnite stats if the game == fortnite
-        if (results.data.stream.game === "Fortnite") {
-          newStreamMsg += ` Fortnite is detected, I'm restarting the stats tracker. Type !newsession if this is a new stream.`;
-          clearTimeout(fortniteTimerID);
-          fortniteTimerID = undefined;
-          fortniteAutoStats();
-        }
+  // if channel is not live, kill everything
+  if (!liveData) {
+    clearTimeout(fortniteTimerID);
+    fortniteTimerID = undefined;
 
-        // if moistureTimer is enabled, restart it too
-        if (options.modes.moisturetimer.enabled) {
-          newStreamMsg += ` I've also enabled the Moisture reminders for you. Type !stopmoisture to stop them.`;
-          clearTimeout(moistureTimerID);
-          moistureTimerID = setTimeout(moistureTimer, moistureTime, options.modes.moisturetimer.mins);
-        }
+    clearTimeout(moistureTimerID);
+    moistureTimerID = undefined;
 
-        client.action(channelName, newStreamMsg);
-        streamIsLive = true;
-      } else if (results.data.stream === null) {
-        // if stream was recently went online, do these:
-        if (streamIsLive === true) {
-          clearTimeout(fortniteTimerID);
-          fortniteTimerID = undefined;
+    if (streamIsLive === true) {
+      const shutdownMsg =
+        "The stream appears to be offline, shutting down all stats timers & reminders. I'll check back every 5 minutes...";
+      await client.action(channelName, shutdownMsg);
+    }
 
-          clearTimeout(moistureTimerID);
-          moistureTimerID = undefined;
+    streamIsLive = false;
+  }
 
-          const shutdownMsg =
-            "The stream appears to be offline. Shutting down Fortnite tracker auto-updates and moisture reminders. I'll check back every 5 minutes...";
-          client.action(channelName, shutdownMsg);
-        }
+  // if channel is live
+  if (liveData) {
+    const curGame = liveData.game;
 
-        streamIsLive = false;
+    // handle fortnite stats
+    if (curGame === "Fortnite") {
+      if (fortniteTimerID === undefined) {
+        const newFortniteMsg = `Fortnite is detected, I'm starting the stats tracker. Type !newsession if this is a new stream.`;
+        await client.action(channelName, newFortniteMsg);
+        fortniteAutoStats();
       }
-    })
-    .catch(e => {
-      console.log("error getting live status: ", e);
-    });
+    }
+
+    // handle moisture timer
+    if (options.modes.moisturetimer.enabled) {
+      if (moistureTimerID === undefined && streamIsLive === false) {
+        clearTimeout(moistureTimerID);
+        moistureTimer(options.modes.moisturetimer.mins);
+        newMoistureMsg += `Moisture reminders enabled! Type !stopmoisture to stop them.`;
+        await client.action(channelName, newMoistureMsg);
+      }
+    }
+
+    streamIsLive = true;
+  }
+
+  // .catch(e => {
+  //   console.log("error getting live status: ", e);
+  // });
 
   // start recursive calls to this function (once every 5 mins should be good?)
   isLiveTimerID = setTimeout(checkChannelStatus, 5 * 60 * 1000);
