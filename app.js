@@ -1,12 +1,14 @@
 require("dotenv").config();
 const tmi = require("tmi.js");
 const axios = require("axios");
+const moment = require("moment");
 
 const options = require("./options.js");
 const autoRefreshStats = true;
 
 let streamIsLive = false;
 let isLiveTimerID = undefined;
+let uptime = 0;
 
 // fortnite tracking mode vars
 const fnscores = require("./modes/fortnite-scores.js");
@@ -189,8 +191,13 @@ const fortniteAutoStats = () => {
 };
 
 //moisture reminders recursive timer
-const moistureMessage = mins => {
-  return `${mins} minutes have passed, strimmer! Moisturize! DrinkPurple`;
+const moistureMessage = () => {
+  if (uptime > 5) {
+    const formattedUptime = moment.duration(uptime, "minutes").humanize();
+    return `Stream has been up for ${formattedUptime}, strimmer! Moisturize! DrinkPurple`;
+  } else {
+    return `Moisture timer has now started. DrinkPurple`;
+  }
 };
 
 // moisture reminders recursive timer
@@ -199,7 +206,7 @@ const moistureTimer = minutes => {
   const channelName = options.channels[0];
 
   client
-    .action(channelName, moistureMessage(minutes))
+    .action(channelName, moistureMessage())
     .then(() => {
       moistureTimerID = setTimeout(moistureTimer, millsecs, minutes);
     })
@@ -215,8 +222,15 @@ const checkIsLive = async (channel, clientID) => {
     );
 
     if (results.data.stream !== null) {
+      // set uptime here
+      const startTime = moment(results.data.stream.created_at);
+      const nowTime = moment();
+      uptime = moment.duration(startTime.diff(nowTime)).as("minutes");
+
+      // return stream data
       return results.data.stream;
     } else {
+      uptime = 0;
       return false;
     }
   } catch (e) {
