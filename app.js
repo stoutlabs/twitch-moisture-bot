@@ -260,6 +260,7 @@ const checkChannelStatus = async () => {
     // handle fortnite stats
     if (curGame === "Fortnite") {
       if (fortniteTimerID === undefined) {
+        await sleeper(1500);
         const newFortniteMsg = `Fortnite is detected, I'm starting the stats tracker. Type !newsession if this is a new stream.`;
         await client.action(channelName, newFortniteMsg);
         fortniteAutoStats();
@@ -271,6 +272,7 @@ const checkChannelStatus = async () => {
       if (moistureTimerID === undefined && streamIsLive === false) {
         clearTimeout(moistureTimerID);
         moistureTimer(options.modes.moisturetimer.mins);
+        await sleeper(1500);
         newMoistureMsg += `Moisture reminders enabled! Type !stopmoisture to stop them.`;
         await client.action(channelName, newMoistureMsg);
       }
