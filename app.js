@@ -225,7 +225,8 @@ const checkIsLive = async (channel, clientID) => {
       // set uptime here
       const startTime = moment(results.data.stream.created_at);
       const nowTime = moment();
-      uptime = moment.duration(startTime.diff(nowTime)).as("minutes");
+      uptime = -moment.duration(startTime.diff(nowTime)).as("minutes");
+      console.log("uptime", uptime);
 
       // return stream data
       return results.data.stream;
@@ -287,7 +288,7 @@ const checkChannelStatus = async () => {
         clearTimeout(moistureTimerID);
         moistureTimer(options.modes.moisturetimer.mins);
         await sleeper(1500);
-        newMoistureMsg += `Moisture reminders enabled! Type !stopmoisture to stop them.`;
+        const newMoistureMsg = `Moisture reminders enabled! Type !stopmoisture to stop them.`;
         await client.action(channelName, newMoistureMsg);
       }
     }
